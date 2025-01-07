@@ -6,7 +6,7 @@ import io
 from diffusers import StableDiffusionXLAdapterPipeline, T2IAdapter, EulerAncestralDiscreteScheduler, AutoencoderKL
 from diffusers.utils import load_image, make_image_grid
 from controlnet_aux.lineart import LineartDetector
-import torch
+
 import matplotlib.pyplot as plt
 import numpy as np
 

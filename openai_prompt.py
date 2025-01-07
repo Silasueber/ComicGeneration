@@ -1,6 +1,6 @@
 from openai import OpenAI
 import json
-client = OpenAI(api_key="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")
+client = 
     
 # Make a request to OpenAI API
 response = client.chat.completions.create(
