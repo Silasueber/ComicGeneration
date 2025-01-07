@@ -5,7 +5,6 @@ from flask_cors import CORS
 from PIL import Image
 import io
 
-import torch
 import matplotlib.pyplot as plt
 import numpy as np
 from openai import OpenAI
