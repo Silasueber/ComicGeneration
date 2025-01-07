@@ -53,6 +53,8 @@ export default function GeneratePage() {
     const blob = new Blob([as_text], { type: "image/svg+xml" });
     // create an URI pointing to that blob
     const url = URL.createObjectURL(blob);
+
+
     open(url);
   }
 
@@ -80,12 +82,35 @@ export default function GeneratePage() {
     return serializer.serializeToString(svgElement);
   }
 
-  function replaceImage(svgText: string, id: string, newImage: string, prompt: string | null) {
+  const blobToBase64 = async (url: string) => {
+    return new Promise(async (resolve, _) => {
+      // do a request to the blob uri
+      const response = await fetch(url);
+  
+      // response has a method called .blob() to get the blob file
+      const blob = await response.blob();
+  
+      // instantiate a file reader
+      const fileReader = new FileReader();
+  
+      // read the file
+      fileReader.readAsDataURL(blob);
+  
+      fileReader.onloadend = function(){
+        resolve(fileReader.result); // Here is the base64 string
+      }
+    });
+  };
+  
+
+  async function replaceImage(svgText: string, id: string, newImage: string, prompt: string | null) {
     const parser = new DOMParser();
     const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
     const svgElement = svgDoc.documentElement;
     const image = svgDoc.getElementById(id)
-    image?.setAttribute("href", newImage)
+    const newData = await blobToBase64(newImage)
+    console.log(newData)
+    image?.setAttribute("href", newData)
     if(prompt)
     {
       image?.setAttribute("prompt", prompt)
@@ -100,6 +125,22 @@ export default function GeneratePage() {
     // Serialize the modified SVG back to a string
     const serializer = new XMLSerializer();
     return serializer.serializeToString(svgElement);
+  }
+
+  const saveSVG = () => {
+    const svg = document.getElementById("comic_page")
+    // convert to a valid XML source
+    const as_text = new XMLSerializer().serializeToString(svg);
+    // store in a Blob
+    const blob = new Blob([as_text], { type: "image/svg+xml" });
+    // create an URI pointing to that blob
+    const url = URL.createObjectURL(blob);
+    var downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = "comic.svg";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   }
 
 
@@ -132,12 +173,16 @@ export default function GeneratePage() {
     }
   };
 
-  const handleRedoClick = async (panelId: string, panelDimensions: PanelDimensions, prompt: {prompt: string | undefined}): Promise<string> => {
+  const handleLoraCHange = (newLora: string) => {
+    
+  }
+
+  const handleRedoClick = async (lora: string, panelId: string, panelDimensions: PanelDimensions, prompt: {prompt: string | undefined}): Promise<string> => {
     
     
     const formData = new FormData();
     formData.append("id", panelId);
-    formData.append("lora", selectedLora);
+    formData.append("lora", lora);
     formData.append("width", panelDimensions.width.toString());
     formData.append("height", panelDimensions.height.toString());
     console.log(prompt)
@@ -157,7 +202,7 @@ export default function GeneratePage() {
       }
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      setComic(replaceImage(comic!, panelId, url, prompt.prompt!))
+      setComic(await replaceImage(comic!, panelId, url, prompt.prompt!))
       return url
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -165,10 +210,10 @@ export default function GeneratePage() {
     }
   }
 
-  const handleSelectImage = (panelId: string, imageUrl: string) => {
+  const handleSelectImage = async (panelId: string, imageUrl: string) => {
     // This is a placeholder. In a real application, you would update your SVG content here.
     console.log(`Selected image ${imageUrl} for panel: ${panelId}`)
-    setComic(replaceImage(comic!, panelId, imageUrl, null ))
+    setComic(await replaceImage(comic!, panelId, imageUrl, null ))
     // You might want to update the comic state here with the new image
   }
 
@@ -252,9 +297,10 @@ export default function GeneratePage() {
             
 
           {comic &&  (
-            <div>
+            <div className='flex flex-col gap-3'>
             <ComicViewer 
                   svgContent={comic} 
+                  lora={selectedLora}
                   onGenerateNew={handleRedoClick}
                   onSelectImage={handleSelectImage}
                   onUpdatePrompt={() => console.log("updated prompt")}
@@ -263,6 +309,11 @@ export default function GeneratePage() {
               
                 Open in new Tab
             </Button>
+            <Button onClick={saveSVG} className='w-full'>
+
+              Download Comic
+            </Button>
+            
           </div>
 
              

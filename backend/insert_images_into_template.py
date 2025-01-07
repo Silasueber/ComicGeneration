@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import os
-from runware import Runware, IImageInference, ILora
 import requests
 import datetime
 import asyncio
@@ -16,6 +15,8 @@ from multiprocessing import Process, Queue
 import base64
 from generate_image import generate_image_and_return_base64
 import ast
+
+import re
 
 
 # @Silas: Update this path to the correct template
@@ -157,7 +158,7 @@ text = [
 # ]
 
 
-general_style_prompt = ", for the cyclops comics style, josan gonzalez, haroon mirza, realist detail, anime, traditional belgian graphic novel"
+general_style_prompt = ", for the cyclops comics style, josan gonzalez, haroon mirza, realist detail, traditional belgian graphic novel"
 #general_style_prompt = ", very few lines, lines, thumbnail sketch, rough, storyboard frame, white fineliner on pure black background, Linework-only, hatched style,quick lines, linienbasiert, craft, A dynamic, expressive rough sketch style, characterized by loose, energetic lines and minimal detail. The artwork emphasizes flow and motion, raw, evocative, spontaneous"
 negative_prompt = "ugly, blurry, low quality"
 #negative_prompt = "intricate details, color, signature, flächig, generated, handwriting, painting, 3D render, photorealistic, polished, refined details, clean or sharp edges, rigid or overly structured composition, highly realistic rendering, smooth gradients, intricate background details, sterile, overworked"
@@ -172,7 +173,7 @@ def get_story(prompt):
     messages=[
         {
             "role": "system",
-            "content": "Create 9 image prompts and text for speech bubbles For image generation which can be used for a comic page based on the story I will provide you. Speech can also be none and then leave it empty if there shouldn't be a speech bubble. The speech should also just have the string of what the speech is NOT who is saying it. "
+            "content": "Create 9 image prompts and text for speech bubbles For image generation which can be used for a comic page based on the story I will provide you. Speech can also be none and then leave it empty if there shouldn't be a speech bubble. The speech should also just have the string of what the speech is NOT who is saying it. Both should exactly be ONE element in the array! "
         },
         {
             "role": "user",
@@ -214,14 +215,12 @@ def generate_image_task(prompt, general_style_prompt, negative_prompt, width, he
     """
     Worker process to generate an image for a specific panel.
     """
-    print(prompt)
-    print(prompt['image'][0])
-    print(prompt['speech'][0])
     try:
-        if len(prompt['speech'][0]) > 2:
+        print(prompt)
+        if prompt['speech'] and len(prompt['speech'][0]) > 2:
             result = asyncio.run(
                 generate_image_and_return_base64(
-                    positive_prompt="Create an image of" + prompt['image'][0] + general_style_prompt + " with an integrated speech bubble or text box. Ensure the speech bubble/text box is seamlessly incorporated into the image, positioned to complement the scene without obstructing important details. Include the following text in the speech bubble/text box: '"+prompt['speech'][0]+"', styled to match the image's aesthetics.",
+                    positive_prompt="Create an image of" + prompt['image'][0] + general_style_prompt + " with an integrated speech bubble, thought bubble or text box. Ensure the speech bubble/text box is seamlessly incorporated into the image, positioned to complement the scene without obstructing important details. Include the following text in the thought bubble/speech bubble/text box: '"+prompt['speech'][0]+"', styled to match the image's aesthetics.",
                     negative_prompt=negative_prompt,
                     desired_width=width,
                     desired_height=height,
@@ -246,15 +245,17 @@ def generate_image_task(prompt, general_style_prompt, negative_prompt, width, he
 def generate_single_image(prompt, id, width, height, lora):
     queue = Queue()
     print(prompt)
+    print(lora)
     try:
-    # Convert the string to a Python dictionary
-        parsed_data = ast.literal_eval(prompt)
-        
-        # Convert the Python dictionary to a JSON-compatible string
-        json_compatible = json.dumps(parsed_data)
-        
-        # Parse the JSON string into a Python dictionary
-        prompt = json.loads(json_compatible)
+        # Replace single quotes with double quotes for keys and string values
+        sanitized_string = re.sub(r"(?<!\\)'", '"', prompt)
+
+        # Ensure the JSON syntax remains valid by accounting for escaped quotes
+        # For example, 'It\'s' becomes 'It"s' which might require correction
+        sanitized_string = re.sub(r'\\?"', r'"', sanitized_string)
+
+        # Attempt to parse the sanitized string
+        prompt = json.loads(sanitized_string)
         print(prompt)
     except (ValueError, SyntaxError) as e:
         print(f"Error processing the input: {e}")
@@ -377,7 +378,7 @@ def insert_images_into_template(layout, lora, prompt):
             image_element = soup.new_tag('image')
             image_element['x'] = panel['x']
             image_element['id'] = panel_id
-            image_element['prompt'] = prompt = prompts[index]
+            image_element['prompt'] = json.dumps(prompts[index])
             image_element['y'] = panel['y']
             image_element['width'] = panel['width']
             image_element['height'] = panel['height']

@@ -4,7 +4,6 @@ This script generates an image based on a prompt and returns the image as base64
 
 from dotenv import load_dotenv
 import os
-from runware import Runware, IImageInference, ILora
 import requests
 import datetime
 import asyncio
@@ -83,8 +82,18 @@ def recompute_dimensions(desired_width: int, desired_height: int, maximise_resol
         width = min(max_pixels, width)
 
     # convert to int
-    width = int(width)
-    height = int(height)
+    width = int(width) # 600
+    height = int(height) # 800
+
+    if height > 1400 or width > 1400:
+        if height > width:
+            scale = 1400 / height
+        else:
+            scale = 1400 / width
+        width *= scale
+        height *= scale
+        width = round(width)
+        height = round(height)
 
     print(f"Generated dimensions: {width}x{height} pixels")
 
@@ -158,12 +167,12 @@ async def generate_image_and_return_base64(positive_prompt, lora, negative_promp
 
     # Flux 1D civitai:896684@1003397 Wizard's Ligne Claire Comic Art Style https://civitai.com/models/896684?modelVersionId=1003397 
 
-    loras = [
-        ILora(
-        model="civitai:138585@153153",
-        weight=1
-        )
-    ]
+    # loras = [
+    #     ILora(
+    #     model="civitai:138585@153153",
+    #     weight=1
+    #     )
+    # ]
 
     num_results = 1  # Careful: currently only 1 result is supported as we return after the first one
 
@@ -242,9 +251,30 @@ async def generate_image_and_return_base64(positive_prompt, lora, negative_promp
                     "num_inference_steps": 28
                 }
             )
-        else:
+        elif lora == "tom":
             output = replicate.run(
                 "cprototyping/tom:704f70189b8d5bebbd1d332e133800f84f6988e47b6f9f6600844ae101d53acb",
+                input={
+                    "prompt": positive_prompt,
+                    "model": "dev",
+                    "go_fast": False,
+                    "lora_scale": 1,
+                    "megapixels": "1",
+                    "num_outputs": 1,
+                    "aspect_ratio": "custom",
+                    "width": min(recomputed_width,1440),
+                    "height": min(recomputed_height,1440),  
+                    "output_format": "webp",
+                    "guidance_scale": 3,
+                    "output_quality": 80,
+                    "prompt_strength": 0.8,
+                    "extra_lora_scale": 1,
+                    "num_inference_steps": 28
+                }
+            )
+        else:
+            output = replicate.run(
+                lora,
                 input={
                     "prompt": positive_prompt,
                     "model": "dev",
@@ -301,8 +331,8 @@ async def generate_image_and_return_base64(positive_prompt, lora, negative_promp
             offset_width = (image.width - desired_width) // 2
             offset_height = (image.height - desired_height) // 2
             # The crop parameters are (left, upper, right, lower), essentially two points forming a rectangle
-            image = image.crop((offset_width, offset_height, image.width - offset_width, image.height - offset_height))
-
+            image = image.resize((int(desired_width), int(desired_height)))
+            # image = image.crop((offset_width, offset_height, image.width - offset_width, image.height - offset_height))
             print(f'Cropped image size: {image.width}x{image.height}')
 
         # convert the PIL image back to base64
