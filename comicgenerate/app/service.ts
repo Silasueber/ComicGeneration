@@ -62,3 +62,30 @@ export const getStory = async (text: string) => {
   return completion.choices[0].message.parsed;
 };
 
+
+export const uploadImageToCloud = async (comic: string) => {
+    const url = "https://api.imgbb.com/1/upload?expiration=600&key="+process.env.IMG_UPLOAD_API;
+    const formData = new FormData();
+    // console.log(comic)
+
+    formData.append("image", comic);
+    formData.append("name", "comictest");
+  
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const r = await response.json()
+        console.log(r)
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+}

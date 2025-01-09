@@ -12,6 +12,9 @@ import TomLora from "../public/tom.webp"
 import Link from 'next/link'
 import { ComicViewer } from './components/ComicViewer'
 import Spinner from './components/Spinner'
+import { uploadImageToCloud } from './service'
+
+import {svg2png} from 'svg-png-converter'
 
 
 const loraOptions = [
@@ -126,6 +129,24 @@ export default function GeneratePage() {
     const serializer = new XMLSerializer();
     return serializer.serializeToString(svgElement);
   }
+
+  const uploadImage = async () => {
+    const svg = document.getElementById("comic_page")
+    // convert to a valid XML source
+    const svgString = new XMLSerializer().serializeToString(svg);
+    // const outputBuffer = await svg2png({ 
+    //   input: svgString, 
+    //   encoding: 'dataURL', 
+    //   format: 'jpeg',
+    // })
+
+    // const svgString  = new XMLSerializer().serializeToString(svg);
+
+
+    // const base64SVG =  window.btoa(svgString);
+
+    // uploadImageToCloud(base64SVG)
+  };
 
   const saveSVG = () => {
     const svg = document.getElementById("comic_page")
@@ -312,6 +333,10 @@ export default function GeneratePage() {
             <Button onClick={saveSVG} className='w-full'>
 
               Download Comic
+            </Button>
+            <Button onClick={uploadImage} className='w-full'>
+
+              Upload Comic
             </Button>
             
           </div>

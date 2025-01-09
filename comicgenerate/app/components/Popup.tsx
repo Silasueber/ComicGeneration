@@ -39,8 +39,8 @@ export function Popup({
 
       try{
         console.log(currentPrompt) // Ensure keys don't get mismatched)
-        setPrompt(JSON.parse(currentPrompt.replaceAll("'",'"'))['image'][0])
-        setSpeech(JSON.parse(currentPrompt.replaceAll("'",'"'))['speech'][0])
+        setPrompt(JSON.parse(currentPrompt.replaceAll("'",'`'))['image'][0])
+        setSpeech(JSON.parse(currentPrompt.replaceAll("'",'`'))['speech'][0])
 
       }catch(e)
       {
@@ -58,7 +58,7 @@ export function Popup({
 
   const handleUpdatePrompt = () => {
     console.log(prompt)
-    onUpdatePrompt("{'image': ['"+prompt.replaceAll("'","")+"'], 'speech': ['"+speech.replaceAll("'","")+"']}")
+    onUpdatePrompt('{"image": ["'+prompt.replaceAll("'","")+'"], "speech": ["'+speech.replaceAll("'","")+'"]}')
     setEditPrompt(false)
   }
 
@@ -129,7 +129,7 @@ export function Popup({
             className="w-full max-w-sm"
           >
           <CarouselContent>
-          {imageHistory.map((imageUrl, index) => (
+          {imageHistory.toReversed().map((imageUrl, index) => (
             <CarouselItem key={index} className="md:basis-1/1 lg:basis-1/1">
             <div className="p-1">
               {/* <Card>
