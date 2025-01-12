@@ -36,11 +36,11 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-export const uploadImageFirebase = async (comic: string) => {
+export const uploadImageFirebase = async (comic: string, title: string) => {
   const storage = getStorage();
-  const storageRef = ref(storage, 'comics/comic.svg');
+  const storageRef = ref(storage, 'comics/'+title+'.png');
   let downloadURL = null
-  await uploadString(storageRef, comic).then(async (snapshot) => {
+  await uploadString(storageRef, comic, "data_url", {contentType: "image/png"}).then(async (snapshot) => {
     console.log(snapshot.ref.toString())
     await getDownloadURL(storageRef).then(result => downloadURL = result); 
   });

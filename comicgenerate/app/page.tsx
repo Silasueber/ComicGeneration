@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -15,6 +16,8 @@ import Spinner from './components/Spinner'
 import { uploadImageFirebase, uploadImageToCloud } from './service'
 import QRCode from "react-qr-code";
 import {svg2png} from 'svg-png-converter'
+import SvgComponent from './components/Footer'
+
 
 
 const loraOptions = [
@@ -45,6 +48,7 @@ export default function GeneratePage() {
   const [loading, setLoading] = useState(false)
   
   const [comicQR, setComicQR] = useState()
+  const [comicQRLoading, setComicQRLoading] = useState(false)
   const [comic, setComic] = useState<string>()
   const [comicblob, setComicblob] = useState<string>()
 
@@ -131,14 +135,150 @@ export default function GeneratePage() {
     return serializer.serializeToString(svgElement);
   }
 
-  const uploadImage = async () => {
-    const svg = document.getElementById("comic_page")
-    // convert to a valid XML source
-    const svgString = new XMLSerializer().serializeToString(svg);
+  function combineSVGs(id_one: string, id_two: string) {
+    const svg1 = document.getElementById(id_one);
+    const svg2 = document.getElementById(id_two);
 
-    const url = await uploadImageFirebase(svgString);
-    console.log(url);
-    setComicQR(url)
+    // Clone the original SVGs
+    const svg1Clone = svg1.cloneNode(true);
+    const svg2Clone = svg2.cloneNode(true);
+
+    // Extract dimensions and background colors
+    console.log(svg1.getAttribute('viewBox')?.split(", ")[3])
+    const svg1Height = parseInt(svg1.getAttribute('viewBox')?.split(", ")[3]);
+    const svg2Height = parseInt(svg2.getAttribute('viewBox')?.split(" ")[3]);
+    const combinedWidth = "2548"
+    const svg1BackgroundColor = svg1.style.backgroundColor || 'transparent';
+    const svg2BackgroundColor = svg2.style.backgroundColor || 'transparent';
+
+    // Create a new combined SVG
+    const combinedSVG = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    
+    combinedSVG.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    combinedSVG.setAttribute('id', 'combinedSVG');
+    combinedSVG.setAttribute("width", "2480")
+    combinedSVG.setAttribute("height", "3808")
+    
+
+    // Add background rectangles for both SVGs
+    const background1 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    background1.setAttribute('width', combinedWidth);
+    background1.setAttribute('height', svg1Height.toString());
+    background1.setAttribute('fill', svg1BackgroundColor);
+    combinedSVG.appendChild(background1);
+
+    const background2 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    background2.setAttribute('width', combinedWidth);
+    background2.setAttribute('height', svg2Height.toString());
+    background2.setAttribute('y', svg1Height.toString());
+    background2.setAttribute('fill', svg2BackgroundColor);
+    combinedSVG.appendChild(background2);
+
+    // Function to filter element nodes
+    const isElementNode = (node) => node.nodeType === 1;
+
+    // Append the first SVG content to the combined SVG
+    Array.from(svg1Clone.childNodes)
+        .filter(isElementNode) // Only process element nodes
+        .forEach(node => {
+            combinedSVG.appendChild(node.cloneNode(true));
+        });
+
+        console.log(Array.from(svg2Clone.childNodes)
+        .filter(isElementNode))
+    // Append the second SVG content with adjusted positions
+    Array.from(svg2Clone.childNodes)
+        .filter(isElementNode) // Only process element nodes
+        .forEach(node => {
+          console.log(node.nodeName)
+          if(node.nodeName == "text")
+          {
+
+            const clonedNode = node.cloneNode(true) as HTMLElement; // Cast to Element
+            clonedNode.setAttribute("x","20")
+            clonedNode.setAttribute("y","3500")
+            combinedSVG.appendChild(clonedNode);
+          }else if(node.nodeName == "image")
+            {
+            const clonedNode = node.cloneNode(true) as HTMLElement; // Cast to Element
+            clonedNode.setAttribute("x","20")
+            clonedNode.setAttribute("y","3500")
+            clonedNode.setAttribute("transform","matrix(.31564 0 0 .31565 2000.95 2480.72)")
+
+            combinedSVG.appendChild(clonedNode);
+
+          }else{
+            const clonedNode = node.cloneNode(true) as HTMLElement; // Cast to Element
+            clonedNode.setAttribute("x","20")
+            clonedNode.setAttribute("y","3500")
+            combinedSVG.appendChild(clonedNode);
+          }
+        });
+        
+    // Add the combined SVG to the DOM below the originals
+    // document.getElementById('outer').appendChild(combinedSVG);
+
+    // const svg = document.getElementById("combinedSVG")
+    // convert to a valid XML source
+    const as_text = new XMLSerializer().serializeToString(combinedSVG);
+    getPNGBase64(as_text)
+    return as_text
+
+
+}
+
+const getPNGBase64 = (svg: string) => {
+  return new Promise((resolve, reject) => {
+    try {
+      // Create a Blob from the SVG string and then convert it to a URL
+      const svgBlob = new Blob([svg], { type: 'image/svg+xml' });
+      const svgUrl = URL.createObjectURL(svgBlob);
+
+      // Create an Image element
+      const img = new window.Image();
+
+      // When the image has loaded, draw it to a canvas and convert it to PNG
+      img.onload = () => {
+        // Create a canvas to draw the image
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set the canvas size to match the image size
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Draw the SVG image onto the canvas
+        ctx.drawImage(img, 0, 0);
+
+        // Convert the canvas to a base64 PNG string
+        const base64PNG = canvas.toDataURL('image/png');
+
+        // Return the base64 PNG via the Promise resolve
+        resolve(base64PNG);
+
+        // Clean up the object URL after use
+        URL.revokeObjectURL(svgUrl);
+      };
+
+      // Handle errors if image fails to load
+      img.onerror = () => reject(new Error('Failed to load SVG image'));
+
+      // Set the image source to the SVG URL
+      img.src = svgUrl;
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+  const uploadImage = async () => {
+    setComicQRLoading(true)
+  const png64 = await getPNGBase64(combineSVGs("comic_page","footer"))
+ 
+  const url = await uploadImageFirebase(png64, storyIdea);
+  console.log(url);
+  setComicQR(url)
+  setComicQRLoading(false)
     // const outputBuffer = await svg2png({ 
     //   input: svgString, 
     //   encoding: 'dataURL', 
@@ -339,11 +479,20 @@ export default function GeneratePage() {
 
               Download Comic
             </Button>
+            {comicQRLoading ? <Button onClick={cleanSvg} className="w-full" disabled> 
+              Loading <Spinner/>
+              </Button> :
+            <>
             <Button onClick={uploadImage} className='w-full'>
 
-              Upload Comic
+              Generate QR Code
             </Button>
-            {comicQR && <QRCode value={comicQR}/>}
+            {comicQR && <div className='flex justify-center'>
+              <QRCode value={comicQR}/>
+              </div>
+              }
+            </>
+          }
             
           </div>
 
@@ -354,6 +503,13 @@ export default function GeneratePage() {
           </CardContent>
         </Card>
       </main>
+      <div className='hidden'>
+
+      <SvgComponent/>
+      </div>
+      <div id='outer' className='w-full'>
+
+      </div>
     </div>
   )
 }
