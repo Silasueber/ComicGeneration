@@ -2,6 +2,8 @@
 import OpenAI from "openai";
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
+
 
 const Character = z.object({
   name: z.string(),
@@ -13,6 +15,38 @@ const Character = z.object({
 const CharacterText = z.object({
   characters: z.array(Character),
 });
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+
+
+const firebaseConfig = {
+  apiKey: process.env.apiKey,
+  authDomain: process.env.authDomain,
+  projectId: process.env.projectId,
+  storageBucket: process.env.storageBucket,
+  messagingSenderId: process.env.messagingSenderId,
+  appId: process.env.appId
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+export const uploadImageFirebase = async (comic: string) => {
+  const storage = getStorage();
+  const storageRef = ref(storage, 'comics/comic.svg');
+  let downloadURL = null
+  await uploadString(storageRef, comic).then(async (snapshot) => {
+    console.log(snapshot.ref.toString())
+    await getDownloadURL(storageRef).then(result => downloadURL = result); 
+  });
+  return downloadURL
+
+}
 
 export const getCharacters = async (text: string) => {
   console.log(process.env.OPENAI_KEY);

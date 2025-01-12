@@ -12,8 +12,8 @@ import TomLora from "../public/tom.webp"
 import Link from 'next/link'
 import { ComicViewer } from './components/ComicViewer'
 import Spinner from './components/Spinner'
-import { uploadImageToCloud } from './service'
-
+import { uploadImageFirebase, uploadImageToCloud } from './service'
+import QRCode from "react-qr-code";
 import {svg2png} from 'svg-png-converter'
 
 
@@ -43,7 +43,8 @@ export default function GeneratePage() {
   const [selectedLora, setSelectedLora] = useState('')
   const [selectedLayout, setSelectedLayout] = useState('')
   const [loading, setLoading] = useState(false)
-
+  
+  const [comicQR, setComicQR] = useState()
   const [comic, setComic] = useState<string>()
   const [comicblob, setComicblob] = useState<string>()
 
@@ -134,6 +135,10 @@ export default function GeneratePage() {
     const svg = document.getElementById("comic_page")
     // convert to a valid XML source
     const svgString = new XMLSerializer().serializeToString(svg);
+
+    const url = await uploadImageFirebase(svgString);
+    console.log(url);
+    setComicQR(url)
     // const outputBuffer = await svg2png({ 
     //   input: svgString, 
     //   encoding: 'dataURL', 
@@ -338,6 +343,7 @@ export default function GeneratePage() {
 
               Upload Comic
             </Button>
+            {comicQR && <QRCode value={comicQR}/>}
             
           </div>
 
