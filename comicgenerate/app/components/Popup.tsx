@@ -6,6 +6,16 @@ import { Textarea } from '@/components/ui/textarea'
 import Spinner from './Spinner'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { Card, CardContent } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+
+const loraOptions = [
+  { value: "silver", label: 'Silver' },
+  { value: "jim", label: 'Jim' },
+  { value: "tom", label: 'Tom' },
+  // { value: "custom", label: 'Custom' },
+]
+
 
 interface PopupProps {
   isOpen: boolean
@@ -80,7 +90,20 @@ export function Popup({
         </DialogHeader>
         <div className="grid gap-4 py-4 ">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Input value={lora} onChange={e => onUpdateLora(e.target.value)}/>
+          <span className="col-span-4">Current Lora:</span>
+            <Select value={lora} onValueChange={e => onUpdateLora(e)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a LoRA" />
+                </SelectTrigger>
+                <SelectContent>
+                  {loraOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {/* {lora == "custom" && <Input onChange={e => onUpdateLora(e.target.value)}/>} */}
             <span className="col-span-4">Current Prompt:</span>
             {
                 editPrompt ? 

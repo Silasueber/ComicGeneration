@@ -18,6 +18,7 @@ const CharacterText = z.object({
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { randomUUID } from "crypto";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -38,6 +39,10 @@ const app = initializeApp(firebaseConfig);
 
 export const uploadImageFirebase = async (comic: string, title: string) => {
   const storage = getStorage();
+  if(title.length == 0)
+  {
+    title = randomUUID().toString()
+  }
   const storageRef = ref(storage, 'comics/'+title+'.png');
   let downloadURL = null
   await uploadString(storageRef, comic, "data_url", {contentType: "image/png"}).then(async (snapshot) => {

@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { ChangeEvent } from 'react'
 import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -17,6 +17,7 @@ import { uploadImageFirebase, uploadImageToCloud } from './service'
 import QRCode from "react-qr-code";
 import {svg2png} from 'svg-png-converter'
 import SvgComponent from './components/Footer'
+import { Label } from '@/components/ui/label'
 
 
 
@@ -271,6 +272,17 @@ const getPNGBase64 = (svg: string) => {
   });
 }
 
+const openSVG = async (event: ChangeEvent<HTMLInputElement>) => {
+  if(event.target.files && event.target.files[0])
+  {
+    const svgContent = await event.target.files[0].text()
+    const blob = new Blob([svgContent], {type: "image/svg+xml"});
+    const url = URL.createObjectURL(blob);
+    setComicblob(url)
+    setComic(scaleSvgDimensions(svgContent))
+  }
+}
+
   const uploadImage = async () => {
     setComicQRLoading(true)
   const png64 = await getPNGBase64(combineSVGs("comic_page","footer"))
@@ -385,12 +397,12 @@ const getPNGBase64 = (svg: string) => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/20 to-background">
+    <div className="min-h-screen bg-gradient-to-b from-primary/20 to-background flex justify-between flex-col">
       <main className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold text-center mb-8">Story Generator</h1>
+        <h1 className="text-4xl font-bold text-center mb-8">Comic Generator</h1>
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle>Generate Your Story</CardTitle>
+            <CardTitle>Generate Your Comic</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -451,7 +463,6 @@ const getPNGBase64 = (svg: string) => {
                 <LayoutSVG layout={selectedLayout} />
               </div>
             )}
-
             {
               loading ? 
               <Button onClick={cleanSvg} className="w-full" disabled> 
@@ -460,6 +471,13 @@ const getPNGBase64 = (svg: string) => {
                 Generate
               </Button>
             }
+            <hr/>
+            
+            <div>
+              <Label htmlFor='comicUpload'>Open Comic</Label>
+              <Input id='comicUpload' type='file' accept='.svg' onInput={(event: ChangeEvent<HTMLInputElement>) => openSVG(event)}></Input>
+            </div>
+            
             
 
           {comic &&  (
@@ -509,6 +527,12 @@ const getPNGBase64 = (svg: string) => {
       </div>
       <div id='outer' className='w-full'>
 
+      </div>
+      <div className='bg-orange-500'>
+        <div className=' flex justify-between m-4 items-center'>
+            <span className='text-lg font-medium'>Silas Ueberschaer, Nele Ahrens, Clarissa Sawatzky</span>
+            <img width={100} height={100} src={"https://startupcity.hamburg/logos/organisations/nextMedia_Logo-Text_sw.png"} alt="next media logo"/>
+        </div>
       </div>
     </div>
   )
