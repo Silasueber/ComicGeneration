@@ -211,7 +211,7 @@ async def generate_image_and_return_base64(positive_prompt, lora, negative_promp
     try:
         if lora == "silver":
             output = replicate.run(
-                "cprototyping/silver:a44a1532d3b8e43fe618928ee4a1313ea4653d59a6b623d7257f91a47872e990",
+                "cprototyping/silver_new:ff366c84c59fac49c5768d9e7c0447371b1b5bd72604fec9960dda7374ab9bf5",
                 input={
                     "prompt": positive_prompt,
                     "model": "dev",
@@ -232,7 +232,7 @@ async def generate_image_and_return_base64(positive_prompt, lora, negative_promp
             )
         elif lora == "jim":
             output = replicate.run(
-                "cprototyping/jim_new:965b088f5e5573a1c3e1dde7518764e7c256537ba16df66f10f257529560194c",
+                "cprototyping/jim_new:0a58fc101a0ae938cb6ba40c0382f2beeb46c5f6144a54833df5cd648c57fa89",
                 input={
                     "prompt": positive_prompt,
                     "model": "dev",
@@ -240,10 +240,10 @@ async def generate_image_and_return_base64(positive_prompt, lora, negative_promp
                     "lora_scale": 1,
                     "megapixels": "1",
                     "num_outputs": 1,
+                    "output_format": "webp",
                     "aspect_ratio": "custom",
                     "width": min(recomputed_width,1440),
                     "height": min(recomputed_height,1440),  
-                    "output_format": "webp",
                     "guidance_scale": 3,
                     "output_quality": 80,
                     "prompt_strength": 0.8,
@@ -272,6 +272,48 @@ async def generate_image_and_return_base64(positive_prompt, lora, negative_promp
                     "num_inference_steps": 28
                 }
             )
+        elif lora == "george":
+            output = replicate.run(
+                "cprototyping/george:0431c530a4f4ef90bcc7a4fbbc2436eda2839e603f760b9a9322001b8bd42216",
+                input={
+                    "prompt": positive_prompt,
+                    "model": "dev",
+                    "go_fast": False,
+                    "lora_scale": 1,
+                    "megapixels": "1",
+                    "num_outputs": 1,
+                    "aspect_ratio": "custom",
+                    "width": min(recomputed_width,1440),
+                    "height": min(recomputed_height,1440),  
+                    "output_format": "webp",
+                    "guidance_scale": 3,
+                    "output_quality": 80,
+                    "prompt_strength": 0.8,
+                    "extra_lora_scale": 1,
+                    "num_inference_steps": 28
+                }
+            )
+        elif lora == "dick":
+            output = replicate.run(
+            "cprototyping/dick:889bf8d5b313468d4532468e674a926678dcf82981c60cdeef3c7c9450b0bccc",
+            input={
+                "prompt": positive_prompt,
+                "model": "dev",
+                "go_fast": False,
+                "lora_scale": 1,
+                "megapixels": "1",
+                "num_outputs": 1,
+                "aspect_ratio": "custom",
+                "width": min(recomputed_width,1440),
+                "height": min(recomputed_height,1440),  
+                "output_format": "webp",
+                "guidance_scale": 3,
+                "output_quality": 80,
+                "prompt_strength": 0.8,
+                "extra_lora_scale": 1,
+                "num_inference_steps": 28
+            }
+        )
         else:
             output = replicate.run(
                 lora,

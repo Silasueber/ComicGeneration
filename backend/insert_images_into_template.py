@@ -215,6 +215,8 @@ def generate_image_task(prompt, general_style_prompt, negative_prompt, width, he
     """
     Worker process to generate an image for a specific panel.
     """
+
+    # TODO: großbuschtaven vom text, create image weg und so
     try:
         print(prompt)
         if prompt['speech'] and len(prompt['speech'][0]) > 2:

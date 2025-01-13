@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from 'next/image'
 import SilverLora from "../public/Silver.webp"
-import JimLora from "../public/jim.webp"
+import JimLora from "../public/jim.png"
 import TomLora from "../public/tom.webp"
+import DickLora from "../public/dick.png"
+import GeorgeLora from "../public/george.png"
 import Link from 'next/link'
 import { ComicViewer } from './components/ComicViewer'
 import Spinner from './components/Spinner'
@@ -29,6 +31,8 @@ const loraOptions = [
   { value: "silver", label: 'Silver' },
   { value: "jim", label: 'Jim' },
   { value: "tom", label: 'Tom' },
+  { value: "dick", label: 'Dick' },
+  { value: "george", label: 'George' },
 ]
 
 const layoutOptions = [
@@ -582,7 +586,7 @@ const openSVG = async (event: ChangeEvent<HTMLInputElement>) => {
               </div>
               {selectedLora && 
               <div className='flex items-center justify-center my-2'>
-                <Image width={200} src={selectedLora == "silver" ? SilverLora : selectedLora == "jim" ? JimLora : TomLora} alt='selected Lora'/>
+                <Image width={200} src={selectedLora == "silver" ? SilverLora : selectedLora == "jim" ? JimLora : selectedLora == "tom" ? TomLora : selectedLora == "dick" ? DickLora : GeorgeLora} alt='selected Lora'/>
               </div>
               }
 
@@ -613,7 +617,7 @@ const openSVG = async (event: ChangeEvent<HTMLInputElement>) => {
                 loading ? 
                 <Button onClick={cleanSvg} className="w-full" disabled> 
                 Loading <Spinner/>
-                </Button> : <Button onClick={cleanSvg} className="w-full">
+                </Button> : <Button onClick={cleanSvg} className="w-full mt-4">
                   Generate
                 </Button>
               }

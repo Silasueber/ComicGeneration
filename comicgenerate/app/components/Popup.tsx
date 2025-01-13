@@ -135,8 +135,9 @@ export function Popup({
             loading ? 
             <Button onClick={generateNewImage} disabled>Loading <Spinner/></Button>
             :
-
-            <Button onClick={generateNewImage}>Generate New Image</Button>
+              
+              <Button onClick={generateNewImage}>Generate New Image</Button>
+            
           }
           <div className='w-full flex items-center justify-center'>
 
