@@ -16,8 +16,12 @@ import Spinner from './components/Spinner'
 import { uploadImageFirebase, uploadImageToCloud } from './service'
 import QRCode from "react-qr-code";
 import {svg2png} from 'svg-png-converter'
-import SvgComponent from './components/Footer'
+import SvgComponent from './components/SVGFooter'
 import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
+import SVGFooter from './components/SVGFooter'
+import Footer from './components/Footer'
 
 
 
@@ -397,15 +401,157 @@ const openSVG = async (event: ChangeEvent<HTMLInputElement>) => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/20 to-background flex justify-between flex-col">
-      <main className="container mx-auto px-4 py-16">
+  //   <div className="min-h-screen bg-gradient-to-b from-primary/20 to-background flex justify-between flex-col">
+  //     <main className="container mx-auto px-4 py-16">
+  //       <h1 className="text-4xl font-bold text-center mb-8">Comic Generator</h1>
+  //       <Card className="max-w-2xl mx-auto">
+  //         <CardHeader>
+  //           <CardTitle>Generate Your Comic</CardTitle>
+  //         </CardHeader>
+  //         <CardContent className="space-y-4">
+  //           <div>
+  //             <label htmlFor="storyIdea" className="block text-sm font-medium mb-1">
+  //               Story Idea
+  //             </label>
+  //             <Input
+  //               id="storyIdea"
+  //               value={storyIdea}
+  //               onChange={(e) => setStoryIdea(e.target.value)}
+  //               placeholder="Enter your story idea"
+  //             />
+  //           </div>
+
+  //           <div>
+  //             <label htmlFor="lora" className="block text-sm font-medium mb-1">
+  //               Select LoRA
+  //             </label>
+  //             <Select value={selectedLora} onValueChange={setSelectedLora}>
+  //               <SelectTrigger className="w-full">
+  //                 <SelectValue placeholder="Select a LoRA" />
+  //               </SelectTrigger>
+  //               <SelectContent>
+  //                 {loraOptions.map((option) => (
+  //                   <SelectItem key={option.value} value={option.value}>
+  //                     {option.label}
+  //                   </SelectItem>
+  //                 ))}
+  //               </SelectContent>
+  //             </Select>
+  //           </div>
+  //           {selectedLora && 
+  //           <div className='flex items-center justify-center'>
+  //             <Image width={200} src={selectedLora == "silver" ? SilverLora : selectedLora == "jim" ? JimLora : TomLora} alt='selected Lora'/>
+  //           </div>
+  //           }
+
+  //           <div>
+  //             <label htmlFor="layout" className="block text-sm font-medium mb-1">
+  //               Select Layout
+  //             </label>
+  //             <Select value={selectedLayout} onValueChange={setSelectedLayout}>
+  //               <SelectTrigger className="w-full">
+  //                 <SelectValue placeholder="Select a layout" />
+  //               </SelectTrigger>
+  //               <SelectContent>
+  //                 {layoutOptions.map((option) => (
+  //                   <SelectItem key={option.value} value={option.value}>
+  //                     {option.label}
+  //                   </SelectItem>
+  //                 ))}
+  //               </SelectContent>
+  //             </Select>
+  //           </div>
+
+  //           {selectedLayout && (
+  //             <div className="mt-4">
+  //               <LayoutSVG layout={selectedLayout} />
+  //             </div>
+  //           )}
+  //           {
+  //             loading ? 
+  //             <Button onClick={cleanSvg} className="w-full" disabled> 
+  //             Loading <Spinner/>
+  //             </Button> : <Button onClick={cleanSvg} className="w-full">
+  //               Generate
+  //             </Button>
+  //           }
+  //           <hr/>
+            
+            // <div>
+            //   <Label htmlFor='comicUpload'>Open Comic</Label>
+            //   <Input id='comicUpload' type='file' accept='.svg' onInput={(event: ChangeEvent<HTMLInputElement>) => openSVG(event)}></Input>
+            // </div>
+            
+            
+
+  //         {comic &&  (
+  //           <div className='flex flex-col gap-3'>
+  //           <ComicViewer 
+  //                 svgContent={comic} 
+  //                 lora={selectedLora}
+  //                 onGenerateNew={handleRedoClick}
+  //                 onSelectImage={handleSelectImage}
+  //                 onUpdatePrompt={() => console.log("updated prompt")}
+  //               />
+  //           <Button className='w-full' onClick={openSvgInTab}>
+              
+  //               Open in new Tab
+  //           </Button>
+  //           <Button onClick={saveSVG} className='w-full'>
+
+  //             Download Comic
+  //           </Button>
+  //           {comicQRLoading ? <Button onClick={cleanSvg} className="w-full" disabled> 
+  //             Loading <Spinner/>
+  //             </Button> :
+  //           <>
+  //           <Button onClick={uploadImage} className='w-full'>
+
+  //             Generate QR Code
+  //           </Button>
+  //           {comicQR && <div className='flex justify-center'>
+  //             <QRCode value={comicQR}/>
+  //             </div>
+  //             }
+  //           </>
+  //         }
+            
+  //         </div>
+
+             
+              
+           
+  //           )}
+  //         </CardContent>
+  //       </Card>
+  //     </main>
+  //     <div className='hidden'>
+
+  //     <SvgComponent/>
+  //     </div>
+  //     <div id='outer' className='w-full'>
+
+  //     </div>
+  //     <div className='bg-orange-500'>
+  //       <div className=' flex justify-between m-4 items-center'>
+  //           <span className='text-lg font-medium'>Silas Ueberschaer, Nele Ahrens, Clarissa Sawatzky</span>
+  //           <img width={100} height={100} src={"https://startupcity.hamburg/logos/organisations/nextMedia_Logo-Text_sw.png"} alt="next media logo"/>
+  //       </div>
+  //     </div>
+  //   </div>
+  // )
+  <div className="min-h-screen bg-gradient-to-b from-primary/20 to-background flex flex-col">
+      <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center mb-8">Comic Generator</h1>
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Generate Your Comic</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
+        <Card className="max-w-4xl mx-auto">
+          <CardContent className="p-6">
+            <Tabs defaultValue="generate" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="generate">Generate Comic</TabsTrigger>
+                <TabsTrigger value="open">Open Existing Comic</TabsTrigger>
+              </TabsList>
+              <TabsContent value="generate">
+              <div>
               <label htmlFor="storyIdea" className="block text-sm font-medium mb-1">
                 Story Idea
               </label>
@@ -417,70 +563,70 @@ const openSVG = async (event: ChangeEvent<HTMLInputElement>) => {
               />
             </div>
 
-            <div>
-              <label htmlFor="lora" className="block text-sm font-medium mb-1">
-                Select LoRA
-              </label>
-              <Select value={selectedLora} onValueChange={setSelectedLora}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a LoRA" />
-                </SelectTrigger>
-                <SelectContent>
-                  {loraOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {selectedLora && 
-            <div className='flex items-center justify-center'>
-              <Image width={200} src={selectedLora == "silver" ? SilverLora : selectedLora == "jim" ? JimLora : TomLora} alt='selected Lora'/>
-            </div>
-            }
-
-            <div>
-              <label htmlFor="layout" className="block text-sm font-medium mb-1">
-                Select Layout
-              </label>
-              <Select value={selectedLayout} onValueChange={setSelectedLayout}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a layout" />
-                </SelectTrigger>
-                <SelectContent>
-                  {layoutOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {selectedLayout && (
-              <div className="mt-4">
-                <LayoutSVG layout={selectedLayout} />
+              <div>
+                <label htmlFor="lora" className="block text-sm font-medium mb-1">
+                  Select LoRA
+                </label>
+                <Select value={selectedLora} onValueChange={setSelectedLora}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a LoRA" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {loraOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-            {
-              loading ? 
-              <Button onClick={cleanSvg} className="w-full" disabled> 
-              Loading <Spinner/>
-              </Button> : <Button onClick={cleanSvg} className="w-full">
-                Generate
-              </Button>
-            }
-            <hr/>
-            
-            <div>
-              <Label htmlFor='comicUpload'>Open Comic</Label>
-              <Input id='comicUpload' type='file' accept='.svg' onInput={(event: ChangeEvent<HTMLInputElement>) => openSVG(event)}></Input>
-            </div>
-            
-            
+              {selectedLora && 
+              <div className='flex items-center justify-center my-2'>
+                <Image width={200} src={selectedLora == "silver" ? SilverLora : selectedLora == "jim" ? JimLora : TomLora} alt='selected Lora'/>
+              </div>
+              }
 
-          {comic &&  (
+              <div>
+                <label htmlFor="layout" className="block text-sm font-medium mb-1">
+                  Select Layout
+                </label>
+                <Select value={selectedLayout} onValueChange={setSelectedLayout}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a layout" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {layoutOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedLayout && (
+                <div className="mt-4">
+                  <LayoutSVG layout={selectedLayout} />
+                </div>
+              )}
+              {
+                loading ? 
+                <Button onClick={cleanSvg} className="w-full" disabled> 
+                Loading <Spinner/>
+                </Button> : <Button onClick={cleanSvg} className="w-full">
+                  Generate
+                </Button>
+              }
+              </TabsContent>
+              <TabsContent value="open">
+              <div>
+                <Label htmlFor='comicUpload'>Open Comic</Label>
+                <Input id='comicUpload' type='file' accept='.svg' onInput={(event: ChangeEvent<HTMLInputElement>) => openSVG(event)}></Input>
+              </div>
+              </TabsContent>
+            </Tabs>
+
+            {comic &&  (
             <div className='flex flex-col gap-3'>
             <ComicViewer 
                   svgContent={comic} 
@@ -518,21 +664,21 @@ const openSVG = async (event: ChangeEvent<HTMLInputElement>) => {
               
            
             )}
+
+            
+
+            
+           
+            
+
+            
+            
           </CardContent>
         </Card>
       </main>
+      <Footer />
       <div className='hidden'>
-
-      <SvgComponent/>
-      </div>
-      <div id='outer' className='w-full'>
-
-      </div>
-      <div className='bg-orange-500'>
-        <div className=' flex justify-between m-4 items-center'>
-            <span className='text-lg font-medium'>Silas Ueberschaer, Nele Ahrens, Clarissa Sawatzky</span>
-            <img width={100} height={100} src={"https://startupcity.hamburg/logos/organisations/nextMedia_Logo-Text_sw.png"} alt="next media logo"/>
-        </div>
+          <SVGFooter/>
       </div>
     </div>
   )
